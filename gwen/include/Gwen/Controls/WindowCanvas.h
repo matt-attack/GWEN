@@ -93,7 +93,8 @@ namespace Gwen
 				virtual void SWSizer_Moved();
 				virtual void LeftSizer_Moved();
 				virtual void RightSizer_Moved();
-				virtual void VerticalSizer_Moved();
+				virtual void BottomVerticalSizer_Moved();
+				virtual void TopVerticalSizer_Moved();
 				virtual void OnTitleDoubleClicked();
 
 				void*		m_pOSWindow;
@@ -108,6 +109,7 @@ namespace Gwen
 				ControlsInternal::Dragger*	m_RightSizer;
 				ControlsInternal::Dragger*	m_LeftSizer;
 				ControlsInternal::Dragger*	m_BottomSizer;
+				ControlsInternal::Dragger*  m_TopSizer;
 				Gwen::Controls::Label*		m_Title;
 
 
