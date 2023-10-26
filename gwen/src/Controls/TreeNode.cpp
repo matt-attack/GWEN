@@ -37,15 +37,15 @@ class TreeNodeText : public Button
 			SetHeight( 16 );
 		}
 
-		void UpdateColours()
+		void UpdateColours() override
 		{
-			if ( IsDisabled() )							{ return SetTextColor( GetSkin()->Colors.Button.Disabled ); }
+			if ( IsDisabled() )							{ return BaseClass::SetTextColor( GetSkin()->Colors.Button.Disabled ); }
 
-			if ( IsDepressed() || GetToggleState() )	{ return SetTextColor( GetSkin()->Colors.Tree.Selected ); }
+			if ( IsDepressed() || GetToggleState() )	{ return BaseClass::SetTextColor( GetSkin()->Colors.Tree.Selected ); }
 
-			if ( IsHovered() )							{ return SetTextColor( GetSkin()->Colors.Tree.Hover ); }
+			if ( IsHovered() )							{ return BaseClass::SetTextColor( GetSkin()->Colors.Tree.Hover ); }
 
-			SetTextColor( GetSkin()->Colors.Tree.Normal );
+			BaseClass::SetTextColor( GetSkin()->Colors.Tree.Normal );
 		}
 };
 
@@ -63,7 +63,7 @@ GWEN_CONTROL_CONSTRUCTOR( TreeNode )
 	m_Title->onDoubleClick.Add( this, &TreeNode::OnDoubleClickName );
 	m_Title->onDown.Add( this, &TreeNode::OnClickName );
 	m_Title->onRightPress.Add( this, &TreeNode::OnRightPress );
-	m_Title->SetHeight(m_Title->GetFont()->size+7);
+	m_Title->SetHeight(m_Title->TextHeight());
 	m_InnerPanel = new Base( this );
 	m_InnerPanel->Dock( Pos::Top );
 	m_InnerPanel->SetHeight( 100 );
@@ -72,6 +72,7 @@ GWEN_CONTROL_CONSTRUCTOR( TreeNode )
 	m_bRoot = false;
 	m_bSelected = false;
 	m_bSelectable = true;
+	Invalidate();
 }
 
 void TreeNode::Render( Skin::Base* skin )
@@ -102,8 +103,6 @@ TreeNode* TreeNode::AddNode( const TextObject & strLabel )
 	return node;
 }
 
-
-
 void TreeNode::Layout( Skin::Base* skin )
 {
 	if ( m_ToggleButton )
@@ -131,6 +130,8 @@ void TreeNode::Layout( Skin::Base* skin )
 
 void TreeNode::PostLayout( Skin::Base* /*skin*/ )
 {
+	m_Title->SetHeight(m_Title->TextHeight());
+
 	if ( SizeToChildren( false, true ) )
 	{
 		InvalidateParent();
@@ -182,6 +183,21 @@ void TreeNode::ExpandAll()
 		if ( !pChild ) { continue; }
 
 		pChild->ExpandAll();
+	}
+}
+
+void TreeNode::CollapseAll()
+{
+	Close();
+	Base::List & children = GetChildNodes();
+
+	for ( Base::List::iterator iter = children.begin(); iter != children.end(); ++iter )
+	{
+		TreeNode* pChild = gwen_cast<TreeNode> ( *iter );
+
+		if ( !pChild ) { continue; }
+
+		pChild->CollapseAll();
 	}
 }
 
@@ -266,6 +282,25 @@ void TreeNode::DeselectAll()
 
 		pChild->DeselectAll();
 	}
+}
+
+Controls::Base::List TreeNode::GetSelectedChildNodes()
+{
+	Controls::Base::List list;
+
+	Base::List & children = m_InnerPanel->GetChildren();
+
+	for ( Base::List::iterator iter = children.begin(); iter != children.end(); ++iter )
+	{
+		TreeNode* pChild = gwen_cast<TreeNode> ( *iter );
+
+		if ( !pChild ) { continue; }
+
+		if ( !pChild->IsSelected() ) { continue; }
+
+		list.push_back(pChild);
+	}
+	return list;
 }
 
 Controls::Base::List & TreeNode::GetChildNodes()

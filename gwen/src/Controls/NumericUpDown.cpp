@@ -33,19 +33,20 @@ GWEN_CONTROL_CONSTRUCTOR( NumericUpDown )
 	m_iMax = 100;
 	m_iMin = 0;
 	m_iNumber = 0;
+	m_iIncrement = 1;
 	SetText( "0" );
 }
 
 void NumericUpDown::OnButtonUp( Base* /*control*/ )
 {
 	SyncNumberFromText();
-	SetValue( m_iNumber + 1 );
+	SetValue( m_iNumber + m_iIncrement, true );
 }
 
 void NumericUpDown::OnButtonDown( Base* /*control*/ )
 {
 	SyncNumberFromText();
-	SetValue( m_iNumber - 1 );
+	SetValue( m_iNumber - m_iIncrement, true );
 }
 
 
@@ -69,7 +70,7 @@ void NumericUpDown::SetMax( int i )
 	m_iMax = i;
 }
 
-void NumericUpDown::SetValue( int i )
+void NumericUpDown::SetValue( int i, bool force )
 {
 	if ( i > m_iMax ) { i = m_iMax; }
 
@@ -83,7 +84,7 @@ void NumericUpDown::SetValue( int i )
 	m_iNumber = i;
 	// Don't update the text if we're typing in it..
 	// Undone - any reason why not?
-	//if ( !HasFocus() )
+	if ( !HasFocus() || force)
 	{
 		SyncTextFromNumber();
 	}
@@ -98,7 +99,7 @@ void NumericUpDown::OnChange()
 void NumericUpDown::OnTextChanged()
 {
 	BaseClass::OnTextChanged();
-	SyncNumberFromText();
+	SetValue( ( int ) GetFloatFromText(), false);
 }
 
 void NumericUpDown::OnEnter()
@@ -106,6 +107,13 @@ void NumericUpDown::OnEnter()
 	SyncNumberFromText();
 	SyncTextFromNumber();
 	BaseClass::OnEnter();
+}
+
+void NumericUpDown::OnLostKeyboardFocus()
+{
+    BaseClass::OnLostKeyboardFocus();
+    SyncNumberFromText();
+	SyncTextFromNumber();
 }
 
 GWEN_CONTROL_CONSTRUCTOR( FloatUpDown )
@@ -127,19 +135,20 @@ GWEN_CONTROL_CONSTRUCTOR( FloatUpDown )
 	m_iMax = 100;
 	m_iMin = 0;
 	m_iNumber = 0;
+	m_iIncrement = 1.0;
 	SetText( "0" );
 }
 
 void FloatUpDown::OnButtonUp( Base* /*control*/ )
 {
 	SyncNumberFromText();
-	SetValue( m_iNumber + 1 );
+	SetValue( m_iNumber + m_iIncrement, true );
 }
 
 void FloatUpDown::OnButtonDown( Base* /*control*/ )
 {
 	SyncNumberFromText();
-	SetValue( m_iNumber - 1 );
+	SetValue( m_iNumber - m_iIncrement, true );
 }
 
 
@@ -163,7 +172,7 @@ void FloatUpDown::SetMax( double i )
 	m_iMax = i;
 }
 
-void FloatUpDown::SetValue( double i )
+void FloatUpDown::SetValue( double i, bool force )
 {
 	if ( i > m_iMax ) { i = m_iMax; }
 
@@ -177,7 +186,7 @@ void FloatUpDown::SetValue( double i )
 	m_iNumber = i;
 	// Don't update the text if we're typing in it..
 	// Undone - any reason why not?
-	//if ( !HasFocus() )
+	if ( !HasFocus() || force)
 	{
 		SyncTextFromNumber();
 	}
@@ -192,7 +201,7 @@ void FloatUpDown::OnChange()
 void FloatUpDown::OnTextChanged()
 {
 	BaseClass::OnTextChanged();
-	SyncNumberFromText();
+	SetValue( ( double ) GetFloatFromText(), false );
 }
 
 void FloatUpDown::OnEnter()
@@ -200,4 +209,11 @@ void FloatUpDown::OnEnter()
 	SyncNumberFromText();
 	SyncTextFromNumber();
 	BaseClass::OnEnter();
+}
+
+void FloatUpDown::OnLostKeyboardFocus()
+{
+    BaseClass::OnLostKeyboardFocus();
+    SyncNumberFromText();
+	SyncTextFromNumber();
 }

@@ -7,6 +7,7 @@
 
 #include "Gwen/Controls/Base.h"
 #include "Gwen/Controls/Label.h"
+#include "Gwen/Controls/ToolTip.h"
 #include "Gwen/Gwen.h"
 #include "Gwen/BaseRender.h"
 #include "Gwen/Skin.h"
@@ -292,6 +293,7 @@ void Base::AddChild( Base* pChild )
 	OnChildAdded( pChild );
 	pChild->m_ActualParent = this;
 }
+
 void Base::RemoveChild( Base* pChild )
 {
 	// If we removed our innerpanel
@@ -315,6 +317,16 @@ void Base::RemoveAllChildren()
 	while ( Children.size() > 0 )
 	{
 		RemoveChild( *Children.begin() );
+	}
+}
+
+void Base::DeleteAllChildren()
+{
+	while ( Children.size() > 0 )
+	{
+		Base* child = *Children.begin();
+		RemoveChild(child);
+		child->DelayedDelete();
 	}
 }
 
@@ -639,7 +651,8 @@ void Base::OnMouseEnter()
 	else if ( GetParent() && GetParent()->GetToolTip() )
 	{ ToolTip::Enable( GetParent() ); }
 
-	Redraw();
+	if (ShouldRedrawOnHover())
+	{ Redraw(); }
 }
 
 void Base::OnMouseLeave()
@@ -651,9 +664,14 @@ void Base::OnMouseLeave()
 	else if (GetParent() && GetParent()->GetToolTip())
 	{ ToolTip::Disable(GetParent()); }
 
-	Redraw();
+	if (ShouldRedrawOnHover())
+	{ Redraw(); }
 }
 
+bool Base::ShouldRedrawOnHover()
+{
+	return false;
+}
 
 bool Base::IsHovered()
 {
@@ -730,8 +748,7 @@ Base* Base::GetControlAt( int x, int y, bool bOnlyIfMouseEnabled )
 	for ( iter = Children.rbegin(); iter != Children.rend(); ++iter )
 	{
 		Base* pChild = *iter;
-		Base* pFound = NULL;
-		pFound = pChild->GetControlAt( x - pChild->X(), y - pChild->Y(), bOnlyIfMouseEnabled );
+		Base* pFound = pChild->GetControlAt( x - pChild->X(), y - pChild->Y(), bOnlyIfMouseEnabled );
 
 		if ( pFound ) { return pFound; }
 	}
@@ -877,6 +894,18 @@ Gwen::Point Base::LocalPosToCanvas( const Gwen::Point & pnt )
 			y += m_Parent->m_InnerPanel->Y();
 		}
 
+		// Also handle the parent's inner having an inner
+		// Looking at you property tree for causing this....
+		// todo there needs to be a better way to do this
+		if (m_Parent->m_InnerPanel )
+		{
+			auto inner_inner = m_Parent->m_InnerPanel->m_InnerPanel;
+			if (inner_inner && inner_inner->IsChild( this ))
+			{
+				x += inner_inner->X();
+				y += inner_inner->Y();
+			}
+		}
 		return m_Parent->LocalPosToCanvas( Gwen::Point( x, y ) );
 	}
 
@@ -897,6 +926,19 @@ Gwen::Point Base::CanvasPosToLocal( const Gwen::Point & pnt )
 		{
 			x -= m_Parent->m_InnerPanel->X();
 			y -= m_Parent->m_InnerPanel->Y();
+		}
+
+		// Also handle the parent's inner having an inner
+		// Looking at you property tree for causing this....
+		// todo there needs to be a better way to do this
+		if (m_Parent->m_InnerPanel )
+		{
+			auto inner_inner = m_Parent->m_InnerPanel->m_InnerPanel;
+			if (inner_inner && inner_inner->IsChild( this ))
+			{
+				x -= inner_inner->X();
+				y -= inner_inner->Y();
+			}
 		}
 
 		return m_Parent->CanvasPosToLocal( Gwen::Point( x, y ) );
@@ -1048,7 +1090,6 @@ bool Base::HandleAccelerator( Gwen::UnicodeString & accelerator )
 bool Base::OnKeyPress( int iKey, bool bPress )
 {
 	bool bHandled = false;
-
 	switch ( iKey )
 	{
 		case Key::Tab:
@@ -1138,7 +1179,7 @@ void Base::RenderFocus( Gwen::Skin::Base* skin )
 
 void Base::SetToolTip( const TextObject & strText )
 {
-	Label* tooltip = new Label( this );
+	BasicToolTip* tooltip = new BasicToolTip( this );
 	tooltip->SetText( strText );
 	tooltip->SetTextColorOverride( GetSkin()->Colors.TooltipText );
 	tooltip->SetPadding( Padding( 5, 3, 5, 3 ) );

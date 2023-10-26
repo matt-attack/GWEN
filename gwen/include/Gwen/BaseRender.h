@@ -49,6 +49,8 @@ namespace Gwen
 				virtual void Begin() {};
 				virtual void End() {};
 
+				virtual void EnableVsync(bool yn) {};
+
 				virtual void SetDrawColor( Color color ) {};
 
 				virtual void DrawFilledRect( Gwen::Rect rect ) {};;
@@ -119,8 +121,12 @@ namespace Gwen
 
 				void SetScale( float fScale ) { m_fScale = fScale; }
 				float Scale() const { return m_fScale; }
+				
+				void SetFontScale( float fScale ) { m_fFontScale = fScale; }
+				float FontScale() const { return m_fFontScale; }
 
 				float m_fScale;
+				float m_fFontScale;
 
 
 			public:

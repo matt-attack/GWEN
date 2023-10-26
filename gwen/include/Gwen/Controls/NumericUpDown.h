@@ -23,10 +23,12 @@ namespace Gwen
 					SetSize( 7, 7 );
 				}
 
-				virtual void Render( Skin::Base* skin )
+				virtual void Render( Skin::Base* skin ) override
 				{
-					skin->DrawNumericUpDownButton( this, IsDepressed(), true );
+					skin->DrawNumericUpDownButton( this, IsDepressed(), true, IsHovered() );
 				}
+
+				virtual bool ShouldRedrawOnHover() override { return true; }
 		};
 
 		class GWEN_EXPORT NumericUpDownButton_Down : public Button
@@ -36,10 +38,12 @@ namespace Gwen
 					SetSize( 7, 7 );
 				}
 
-				virtual void Render( Skin::Base* skin )
+				virtual void Render( Skin::Base* skin ) override
 				{
-					skin->DrawNumericUpDownButton( this, IsDepressed(), false );
+					skin->DrawNumericUpDownButton( this, IsDepressed(), false, IsHovered() );
 				}
+
+				virtual bool ShouldRedrawOnHover() override { return true; }
 		};
 
 		class GWEN_EXPORT NumericUpDown : public TextBoxNumeric
@@ -48,33 +52,36 @@ namespace Gwen
 
 				GWEN_CONTROL( NumericUpDown, TextBoxNumeric );
 
-				virtual void SetMin( int i );
-				virtual void SetMax( int i );
-				virtual void SetValue( int i );
+				void SetMin( int i );
+				void SetMax( int i );
+				void SetValue( int i, bool force = true );
+				void SetIncrement( int i ) { m_iIncrement = i; }
+				int GetValueNumeric() { return m_iNumber; }
 
 				Event::Caller	onChanged;
 
 			private:
 
-				virtual void OnEnter();
-				virtual void OnChange();
-				virtual void OnTextChanged();
+				void OnEnter();
+				void OnChange();
+				void OnTextChanged();
 
-				virtual void OnButtonUp( Base* control );
-				virtual void OnButtonDown( Base* control );
+				void OnButtonUp( Base* control );
+				void OnButtonDown( Base* control );
 
-				virtual bool OnKeyUp( bool bDown )	{	if ( bDown ) { OnButtonUp( NULL ); } return true;   }
-				virtual bool OnKeyDown( bool bDown ) {	if ( bDown ) { OnButtonDown( NULL ); } return true; }
+				virtual bool OnKeyUp( bool bDown ) override	{	if ( bDown ) { OnButtonUp( NULL ); } return true;   }
+				virtual bool OnKeyDown( bool bDown ) override {	if ( bDown ) { OnButtonDown( NULL ); } return true; }
 
 				virtual void SyncTextFromNumber();
 				virtual void SyncNumberFromText();
 
+				virtual void OnLostKeyboardFocus();
 
 
 				int m_iNumber;
 				int m_iMax;
 				int m_iMin;
-
+				int m_iIncrement;
 		};
 		
 		class GWEN_EXPORT FloatUpDown : public TextBoxNumeric
@@ -83,33 +90,36 @@ namespace Gwen
 
 				GWEN_CONTROL( FloatUpDown, TextBoxNumeric );
 
-				virtual void SetMin( double i );
-				virtual void SetMax( double i );
-				virtual void SetValue( double i );
+				void SetMin( double i );
+				void SetMax( double i );
+				void SetValue( double i, bool force = true );
+				void SetIncrement( double i ) { m_iIncrement = i; }
+				double GetValueNumeric() { return m_iNumber; }
 
 				Event::Caller	onChanged;
 
 			private:
 
-				virtual void OnEnter();
-				virtual void OnChange();
-				virtual void OnTextChanged();
+				void OnEnter();
+				void OnChange();
+				void OnTextChanged();
 
-				virtual void OnButtonUp( Base* control );
-				virtual void OnButtonDown( Base* control );
+				void OnButtonUp( Base* control );
+				void OnButtonDown( Base* control );
 
-				virtual bool OnKeyUp( bool bDown )	{	if ( bDown ) { OnButtonUp( NULL ); } return true;   }
-				virtual bool OnKeyDown( bool bDown ) {	if ( bDown ) { OnButtonDown( NULL ); } return true; }
+				virtual bool OnKeyUp( bool bDown ) override	{	if ( bDown ) { OnButtonUp( NULL ); } return true;   }
+				virtual bool OnKeyDown( bool bDown ) override {	if ( bDown ) { OnButtonDown( NULL ); } return true; }
 
 				virtual void SyncTextFromNumber();
 				virtual void SyncNumberFromText();
 
+				virtual void OnLostKeyboardFocus();
 
 
 				double m_iNumber;
 				double m_iMax;
 				double m_iMin;
-
+				double m_iIncrement;
 		};
 	}
 }

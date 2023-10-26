@@ -20,9 +20,9 @@
 using namespace Gwen;
 using namespace Gwen::Controls;
 
-WindowCanvas::WindowCanvas( int x, int y, int w, int h, Gwen::Skin::Base* pSkin, const Gwen::String & strWindowTitle ) : BaseClass( NULL )
+WindowCanvas::WindowCanvas( int x, int y, int w, int h, Gwen::Skin::Base* pSkin, const Gwen::String & strWindowTitle, bool is_menu ) : BaseClass( NULL )
 {
-	m_bHasTitleBar = !Platform::WindowHasTitleBar();
+	m_bHasTitleBar = !Platform::WindowHasTitleBar() && !is_menu;
 	m_bQuit = false;
 	m_bCanMaximize = true;
 	m_bIsMaximized = false;
@@ -38,12 +38,19 @@ WindowCanvas::WindowCanvas( int x, int y, int w, int h, Gwen::Skin::Base* pSkin,
 	}
 	m_WindowPos  = Gwen::Point( x, y );
 
-	m_pOSWindow = Gwen::Platform::CreatePlatformWindow( x, y, w, h, strWindowTitle, pSkin->GetRender() );
+	m_pOSWindow = Gwen::Platform::CreatePlatformWindow( x, y, w, h, strWindowTitle, pSkin->GetRender(), is_menu );
 	pSkin->GetRender()->InitializeContext(this);
 	pSkin->GetRender()->Init();
 	m_pSkinChange = pSkin;
 	SetSize( w, h );
-	SetMinimumSize(Gwen::Point(std::min(w, 100), std::min(h, 40)));
+	if (is_menu)
+	{
+		SetMinimumSize(Gwen::Point(0, 0));
+	}
+	else
+	{
+		SetMinimumSize(Gwen::Point(std::min(w, 100), std::min(h, 40)));
+	}
 	
 	if (m_bHasTitleBar)
 	{
@@ -86,12 +93,52 @@ WindowCanvas::WindowCanvas( int x, int y, int w, int h, Gwen::Skin::Base* pSkin,
 		m_pMinimize->SetWindow( this );
 
 		// Bottom Right Corner Sizer
-		m_Sizer = new Gwen::ControlsInternal::Dragger( this );
-		m_Sizer->SetSize( 16, 16 );
-		m_Sizer->SetDoMove( false );
-		m_Sizer->onDragged.Add( this, &WindowCanvas::Sizer_Moved );
-		m_Sizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
-		m_Sizer->SetCursor( Gwen::CursorType::SizeNWSE );
+		m_SESizer = new Gwen::ControlsInternal::Dragger( this );
+		m_SESizer->SetSize( 16, 16 );
+		m_SESizer->SetDoMove( false );
+		m_SESizer->onDragged.Add( this, &WindowCanvas::SESizer_Moved );
+		m_SESizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
+		m_SESizer->SetCursor( Gwen::CursorType::SizeNWSE );
+		
+		// Bottom Left Corner Sizer
+		m_SWSizer = new Gwen::ControlsInternal::Dragger( this );
+		m_SWSizer->SetSize( 16, 16 );
+		m_SWSizer->SetDoMove( false );
+		m_SWSizer->onDragged.Add( this, &WindowCanvas::SWSizer_Moved );
+		m_SWSizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
+		m_SWSizer->SetCursor( Gwen::CursorType::SizeNESW );
+		
+		// Right Side Sizer
+		m_RightSizer = new Gwen::ControlsInternal::Dragger( this );
+		m_RightSizer->SetSize( 10, 16 );
+		m_RightSizer->SetDoMove( false );
+		m_RightSizer->onDragged.Add( this, &WindowCanvas::RightSizer_Moved );
+		m_RightSizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
+		m_RightSizer->SetCursor( Gwen::CursorType::SizeWE );
+		
+		// Left Side Sizer
+		m_LeftSizer = new Gwen::ControlsInternal::Dragger( this );
+		m_LeftSizer->SetSize( 10, 16 );
+		m_LeftSizer->SetDoMove( false );
+		m_LeftSizer->onDragged.Add( this, &WindowCanvas::LeftSizer_Moved );
+		m_LeftSizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
+		m_LeftSizer->SetCursor( Gwen::CursorType::SizeWE );
+		
+		// Bottom Side Sizer
+		m_BottomSizer = new Gwen::ControlsInternal::Dragger( this );
+		m_BottomSizer->SetSize( 16, 10 );
+		m_BottomSizer->SetDoMove( false );
+		m_BottomSizer->onDragged.Add( this, &WindowCanvas::BottomVerticalSizer_Moved );
+		m_BottomSizer->onDragStart.Add( this, &WindowCanvas::Dragger_Start );
+		m_BottomSizer->SetCursor( Gwen::CursorType::SizeNS );
+
+		// Top Side Sizer
+		m_TopSizer = new Gwen::ControlsInternal::Dragger(this);
+		m_TopSizer->SetSize(16, 10);
+		m_TopSizer->SetDoMove(false);
+		m_TopSizer->onDragged.Add(this, &WindowCanvas::TopVerticalSizer_Moved);
+		m_TopSizer->onDragStart.Add(this, &WindowCanvas::Dragger_Start);
+		m_TopSizer->SetCursor(Gwen::CursorType::SizeNS);
 	}
 }
 
@@ -107,13 +154,67 @@ void* WindowCanvas::GetWindow()
 
 void WindowCanvas::Layout( Skin::Base* skin )
 {
+	BaseClass::Layout( skin );
+}
+
+Base* WindowCanvas::GetControlAt( int x, int y, bool bOnlyIfMouseEnabled )
+{
+	if ( Hidden() )
+	{ return NULL; }
+
+	if ( x < 0 || y < 0 || x >= Width() || y >= Height() )
+	{ return NULL; }
+	
+	// Check each of our draggers first
+	const int sizer_border = 8;
 	if (m_bHasTitleBar)
 	{
-		m_Sizer->BringToFront();
-		m_Sizer->SetSize(16, 16);
-		m_Sizer->Position( Pos::Right | Pos::Bottom );
+		if (y > Height() - sizer_border)
+		{
+			if (x < sizer_border)
+			{
+				return m_SWSizer;
+			}
+			else if (x > Width() - sizer_border)
+			{
+				return m_SESizer;
+			}
+			else
+			{
+				return m_BottomSizer;
+			}
+		}
+		else
+		{
+			if (x < sizer_border)
+			{
+				return m_LeftSizer;
+			}
+			else if (x > Width() - sizer_border)
+			{
+				return m_RightSizer;
+			}
+			else if (y < sizer_border)
+			{
+				return m_TopSizer;
+			}
+		}
 	}
-	BaseClass::Layout( skin );
+
+	Base::List::reverse_iterator iter;
+
+	for ( iter = Children.rbegin(); iter != Children.rend(); ++iter )
+	{
+		Base* pChild = *iter;
+		Base* pFound = pChild->GetControlAt( x - pChild->X(), y - pChild->Y(), bOnlyIfMouseEnabled );
+
+		if ( pFound ) { return pFound; }
+	}
+
+	if ( bOnlyIfMouseEnabled && !GetMouseInputEnabled() )
+	{ return NULL; }
+
+	return this;
 }
 
 int last_x = 0;
@@ -147,7 +248,7 @@ void WindowCanvas::DoThink()
 	{
 		last_x = last_y = 0;
 	}
-	
+
 	bool real_maximized = Platform::IsWindowMaximized( m_pOSWindow );
 	if (m_bIsMaximized != real_maximized)
 	{
@@ -159,6 +260,7 @@ void WindowCanvas::DoThink()
 	RenderCanvas();
 }
 
+//int i = 0;
 void WindowCanvas::RenderCanvas()
 {
 	//
@@ -168,9 +270,15 @@ void WindowCanvas::RenderCanvas()
 	//
 	if ( !NeedsRedraw() )
 	{
-		Platform::Sleep( 10 );
+		Platform::Sleep( 10 );// this probably shouldnt be here
 		return;
 	}
+
+	// If the canvas was needs to be rerendered, its possible things moved around
+	// Update our hovered control so this is correct
+	Gwen::Input::UpdateHovered();
+
+	//printf("Redraw %i\n", i++%10000);
 
 	m_bNeedsRedraw = false;
 	Gwen::Renderer::Base* render = m_Skin->GetRender();
@@ -182,6 +290,7 @@ void WindowCanvas::RenderCanvas()
 		render->SetClipRegion( GetRenderBounds() );
 		render->SetRenderOffset( Gwen::Point( X() * -1, Y() * -1 ) );
 		render->SetScale( Scale() );
+		render->SetFontScale( FontScale() );
 
 		if ( m_bDrawBackground )
 		{
@@ -218,7 +327,6 @@ void WindowCanvas::Render( Skin::Base* skin )
 	}
 }
 
-
 void WindowCanvas::DestroyWindow()
 {
 	if ( m_pOSWindow )
@@ -246,12 +354,15 @@ Skin::Base* WindowCanvas::GetSkin( void )
 	return BaseClass::GetSkin();
 }
 
-
 void WindowCanvas::Dragger_Start()
 {
 	Gwen::Platform::GetCursorPos( m_HoldPos );
 	m_HoldPos.x -= m_WindowPos.x;
 	m_HoldPos.y -= m_WindowPos.y;
+	
+	m_WindowRightPos = m_WindowPos;
+	m_WindowRightPos.x += Width() * GetDPIScaling().x;
+	m_WindowRightPos.y += Height() * GetDPIScaling().x;
 }
 
 void WindowCanvas::Dragger_Moved()
@@ -282,7 +393,21 @@ void WindowCanvas::SetPos( int x, int y )
 	m_WindowPos.x = x;
 	m_WindowPos.y = y;
 	Gwen::PointF scaling = GetDPIScaling();
-	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, x, y, Width()*scaling.x, Height()*scaling.y);
+
+	auto width = Width()*scaling.x;
+	auto height = Height()*scaling.y;
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, x, y, width, height);
+}
+
+void WindowCanvas::SetWindowSize(int x, int y)
+{
+	Gwen::PointF scaling = GetDPIScaling();
+
+	auto width = x*scaling.x;
+	auto height = y*scaling.y;
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, m_WindowPos.x, m_WindowPos.y, width, height);
+
+	SetSize(x, y);
 }
 
 void WindowCanvas::CloseButtonPressed()
@@ -295,15 +420,105 @@ bool WindowCanvas::IsOnTop()
 	return Gwen::Platform::HasFocusPlatformWindow( m_pOSWindow );
 }
 
-
-void WindowCanvas::Sizer_Moved()
+void WindowCanvas::SESizer_Moved()
 {
 	Gwen::Point p;
 	Gwen::Platform::GetCursorPos( p );
 	int w = ( p.x ) - m_WindowPos.x;
 	int h = ( p.y ) - m_WindowPos.y;
-	w = Clamp( w, 100, 9999 );
-	h = Clamp( h, 100, 9999 );
+	w = Clamp( w, m_MinimumSize.x, 9999 );
+	h = Clamp( h, m_MinimumSize.y, 9999 );
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, m_WindowPos.x, m_WindowPos.y, w, h);
+	GetSkin()->GetRender()->ResizedContext( this, w, h);
+	this->SetSize( w/Scale(), h/Scale());
+	BaseClass::DoThink();
+	RenderCanvas();
+}
+
+void WindowCanvas::SWSizer_Moved()
+{
+	// for this we want to pin the right side of the window
+	Gwen::Point p;
+	Gwen::Platform::GetCursorPos( p );
+	int w = m_WindowRightPos.x - p.x;
+	int h = ( p.y ) - m_WindowPos.y;
+	w = Clamp( w, m_MinimumSize.x, 9999 );
+	h = Clamp( h, m_MinimumSize.y, 9999 );
+	int desired_x = m_WindowRightPos.x - w;
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, desired_x, m_WindowPos.y, w, h);
+	GetSkin()->GetRender()->ResizedContext( this, w, h);
+	this->SetSize( w/Scale(), h/Scale());
+	BaseClass::DoThink();
+	RenderCanvas();
+}
+
+void WindowCanvas::RightSizer_Moved()
+{
+	Gwen::Point p;
+	Gwen::Platform::GetCursorPos( p );
+	Gwen::PointF scaling = GetDPIScaling();
+	int w = ( p.x ) - m_WindowPos.x;
+	int h = Height()*scaling.y;
+	w = Clamp( w, m_MinimumSize.x, 9999 );
+	h = Clamp( h, m_MinimumSize.y, 9999 );
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, m_WindowPos.x, m_WindowPos.y, w, h);
+	GetSkin()->GetRender()->ResizedContext( this, w, h);
+	this->SetSize( w/Scale(), h/Scale());
+	BaseClass::DoThink();
+	RenderCanvas();
+}
+
+void WindowCanvas::LeftSizer_Moved()
+{
+	// for this we want to pin the right side of the window
+	Gwen::Point p;
+	Gwen::Platform::GetCursorPos( p );
+	Gwen::PointF scaling = GetDPIScaling();
+	int w = m_WindowRightPos.x - p.x;
+	int h = Height()*scaling.y;
+	w = Clamp( w, m_MinimumSize.x, 9999 );
+	h = Clamp( h, m_MinimumSize.y, 9999 );
+	int desired_x = m_WindowRightPos.x - w;
+	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, desired_x, m_WindowPos.y, w, h);
+	m_WindowPos.x = desired_x;
+	GetSkin()->GetRender()->ResizedContext( this, w, h);
+	this->SetSize( w/Scale(), h/Scale());
+	BaseClass::DoThink();
+	RenderCanvas();
+}
+
+void WindowCanvas::TopVerticalSizer_Moved()
+{
+	Gwen::Point p;
+	Gwen::Platform::GetCursorPos(p);
+	Gwen::PointF scaling = GetDPIScaling();
+
+	auto rel_pos = p - m_WindowPos;
+	auto dpos = m_HoldPos - rel_pos;
+	int desired_y = m_HoldPos.y + p.y;
+
+	int w = Width() * scaling.x;
+	int h = m_WindowRightPos.y - p.y;
+	w = Clamp(w, m_MinimumSize.x, 9999);
+	h = Clamp(h, m_MinimumSize.y, 9999);
+	Gwen::Platform::SetBoundsPlatformWindow(m_pOSWindow, m_WindowPos.x, desired_y, w, h);
+	// we have to update this here for some reason?
+	m_WindowPos.y = desired_y;
+	GetSkin()->GetRender()->ResizedContext(this, w, h);
+	this->SetSize(w / Scale(), h / Scale());
+	BaseClass::DoThink();
+	RenderCanvas();
+}
+
+void WindowCanvas::BottomVerticalSizer_Moved()
+{
+	Gwen::Point p;
+	Gwen::Platform::GetCursorPos( p );
+	Gwen::PointF scaling = GetDPIScaling();
+	int w = Width()*scaling.x;
+	int h = ( p.y ) - m_WindowPos.y;
+	w = Clamp( w, m_MinimumSize.x, 9999 );
+	h = Clamp( h, m_MinimumSize.y, 9999 );
 	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, m_WindowPos.x, m_WindowPos.y, w, h);
 	GetSkin()->GetRender()->ResizedContext( this, w, h);
 	this->SetSize( w/Scale(), h/Scale());
@@ -362,4 +577,37 @@ void WindowCanvas::SetMinimumSize( const Gwen::Point & minSize )
 	m_MinimumSize = minSize;
 	
 	Gwen::Platform::SetWindowMinimumSize(m_pOSWindow, minSize.x, minSize.y);
+}
+
+void WindowCanvas::SetSizable( bool b )
+{
+	if (m_bHasTitleBar)
+	{
+		m_SWSizer->SetHidden( !b );
+		m_SESizer->SetHidden( !b );
+		m_LeftSizer->SetHidden( !b );
+		m_RightSizer->SetHidden( !b );
+		m_BottomSizer->SetHidden( !b );
+		m_TopSizer->SetHidden( !b );
+	}
+}
+
+void WindowCanvas::OnChildRemoved( Controls::Base* pChild )
+{
+	BaseClass::OnChildRemoved(pChild);
+
+	if (m_bRemoveWhenChildless && NumChildren() == 0)
+	{
+		InputQuit();
+	}
+}
+
+void WindowCanvas::SetTitle( Gwen::String title )
+{
+	Gwen::Platform::SetWindowTitle(m_pOSWindow, title);
+
+	if (m_bHasTitleBar)
+	{
+		m_Title->SetText( title );
+	}
 }

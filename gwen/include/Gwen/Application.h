@@ -12,10 +12,14 @@
 #include "Gwen/Controls/WindowCanvas.h"
 #include "Gwen/Skins/TexturedBase.h"
 #include "Gwen/Platform.h"
+#include "Gwen/Anim.h"
+
+#include "../../resources.h"
 
 #ifndef _WIN32
 #include <signal.h>
 #endif
+
 
 namespace Gwen
 {
@@ -29,7 +33,7 @@ extern BaseApplication* gApplication;
 class BaseApplication
 {
 public:
-	virtual Gwen::Controls::Base* AddWindow(const std::string& title, int w, int h, int x = -1, int y = -1) = 0;
+	virtual Gwen::Controls::WindowCanvas* AddWindow(const std::string& title, int w, int h, int x = -1, int y = -1, bool is_menu = false) = 0;
 
 	virtual void RequestQuit() = 0;
 };
@@ -42,7 +46,7 @@ template<class T>
 class Application: public BaseApplication
 {
 	std::wstring default_font_ = L"Segoe UI";
-	double default_font_size_ = 1.0;
+	double default_font_size_ = 10.0;
 	std::string skin_ = "DefaultSkin.png";
 	
 	std::vector<Gwen::Controls::WindowCanvas*> canvases_;
@@ -151,19 +155,40 @@ public:
 			}
 
 			// If we dont need a redraw, sleep until we get new input
-			Gwen::Platform::WaitForEvent();
+			if (!Gwen::Anim::HasActiveAnimation())
+			{
+				Gwen::Platform::WaitForEvent(0);
+			}
+			else
+			{
+				// If we have an active anim, update at 60 Hz
+				Gwen::Platform::WaitForEvent(16);
+			}
 		}
 		return true;
 	}
 
-	Gwen::Controls::Base* AddWindow(const std::string& title, int w, int h, int x = -1, int y = -1)
+	Gwen::Controls::WindowCanvas* AddWindow(const std::string& title, int w, int h, int x = -1, int y = -1, bool is_menu = false)
 	{
 		T* renderer = new T();
 
 		auto skin = new Gwen::Skin::TexturedBase(renderer);// todo parameterize this
 
-		Gwen::Controls::WindowCanvas* window_canvas = new Gwen::Controls::WindowCanvas(x, y, w, h, skin, title);
-		window_canvas->SetSizable(true);
+		Gwen::Controls::WindowCanvas* window_canvas = new Gwen::Controls::WindowCanvas(x, y, w, h, skin, title, is_menu);
+		window_canvas->SetSizable(!is_menu);
+
+		if (FILE* f = fopen(skin_.c_str(), "rb"))
+		{
+			fclose(f);
+		}
+		else
+		{
+			// create the skin from default
+			f = fopen(skin_.c_str(), "wb");
+			fwrite(DefaultSkin_png, 1, DefaultSkin_png_size, f);
+			fclose(f);
+			printf("Skin doesnt exist. Creating from default.\n");
+		}
 
 		skin->Init(skin_);
 		skin->SetDefaultFont(default_font_, default_font_size_);

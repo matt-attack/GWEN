@@ -27,14 +27,14 @@ namespace Gwen
 
 				GWEN_CONTROL( ScrollControl, Base );
 
-				virtual void Layout( Skin::Base* skin );
-				virtual void Render( Skin::Base* skin );
+				virtual void Layout( Skin::Base* skin ) override;
+				virtual void Render( Skin::Base* skin ) override;
 
 				virtual void SetScroll( bool h, bool v );
 				virtual void SetAutoHideBars( bool should ) { m_bAutoHideBars = should; }
 				virtual bool CanScrollH() { return m_bCanScrollH; }
 				virtual bool CanScrollV() { return m_bCanScrollV; }
-				virtual void OnChildBoundsChanged( Gwen::Rect oldChildBounds, Base* pChild );
+				virtual void OnChildBoundsChanged( Gwen::Rect oldChildBounds, Base* pChild ) override;
 				virtual void UpdateScrollBars();
 
 				virtual void SetVScrollRequired( bool req );
@@ -45,7 +45,7 @@ namespace Gwen
 				virtual void VBarMoved( Controls::Base* control );
 				virtual void HBarMoved( Controls::Base* control );
 
-				virtual bool OnMouseWheeled( int iDelta );
+				virtual bool OnMouseWheeled( int iDelta ) override;
 
 				virtual void ScrollToBottom();
 				virtual void ScrollToTop();
@@ -53,6 +53,8 @@ namespace Gwen
 				virtual void ScrollToRight();
 
 				virtual void Clear();
+
+				virtual void SizeToMinimum(bool yn) { m_bSizeDockedToMinimum = yn; }
 
 			protected:
 
@@ -62,6 +64,7 @@ namespace Gwen
 				bool m_bCanScrollV;
 
 				bool m_bAutoHideBars;
+				bool m_bSizeDockedToMinimum;
 
 				Controls::BaseScrollBar* m_VerticalScrollBar;
 				Controls::BaseScrollBar* m_HorizontalScrollBar;

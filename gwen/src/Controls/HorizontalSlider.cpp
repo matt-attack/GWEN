@@ -18,9 +18,9 @@ GWEN_CONTROL_CONSTRUCTOR( HorizontalSlider )
 	m_SliderBar->SetHorizontal( true );
 }
 
-float HorizontalSlider::CalculateValue()
+double HorizontalSlider::CalculateValue()
 {
-	return ( float ) m_SliderBar->X() / ( float )( Width() - m_SliderBar->Width() );
+	return ( double ) m_SliderBar->X() / ( double )( Width() - m_SliderBar->Width() );
 }
 
 void HorizontalSlider::UpdateBarFromValue()

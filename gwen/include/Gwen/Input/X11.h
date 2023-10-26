@@ -64,6 +64,8 @@ namespace Gwen
 								}
 								if (len == 1 && (text[0] >= 32 && text[0] <= 126))
 								{
+									if (text[0] == ' ') { Gwen::Input::OnKeyEvent( Gwen::Key::Space, press); }
+
                                     if (!press) { return false; }
                                     
 									Gwen::UnicodeChar chr = ( Gwen::UnicodeChar ) text[0];
@@ -74,7 +76,7 @@ namespace Gwen
 								if (key == XK_BackSpace) { iKey = Gwen::Key::Backspace; }
 								else if (key == XK_Tab) { iKey = Gwen::Key::Tab; }
 								else if (key == XK_Delete) { iKey = Gwen::Key::Delete; }
-								else if (key == XK_Return) { iKey = Gwen::Key::Return; }
+								else if (key == XK_Return || key == XK_KP_Enter) { iKey = Gwen::Key::Return; }
 								else if (key == XK_Left) { iKey = Gwen::Key::Left; }
 								else if (key == XK_Up) { iKey = Gwen::Key::Up; }
 								else if (key == XK_Down) { iKey = Gwen::Key::Down; }

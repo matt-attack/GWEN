@@ -20,10 +20,17 @@ namespace Gwen
 						SetText( "" );
 					}
 
-					void Render( Skin::Base* skin )
+					void Render( Skin::Base* skin ) override
 					{
+						// Draw an outline to make sure its not invisible when white
+						skin->GetRender()->SetDrawColor( Gwen::Color( 0, 0, 0 ) );
+						Gwen::Rect r = GetRenderBounds();
+						skin->GetRender()->DrawFilledRect( r );
+
+						// Draw the color itself
 						skin->GetRender()->SetDrawColor( m_Color );
-						skin->GetRender()->DrawFilledRect( GetRenderBounds() );
+						r.x += 1; r.y += 1; r.w -= 2; r.h -= 2;
+						skin->GetRender()->DrawFilledRect( r );
 					}
 
 					void SetColor( const Gwen::Color & col ) { m_Color = col; }
@@ -54,6 +61,8 @@ namespace Gwen
 						Gwen::Controls::HSVColorPicker* picker = new Gwen::Controls::HSVColorPicker( pMenu );
 						picker->Dock( Pos::Fill );
 						picker->SetSize( 256, 128 );
+						// This is required because the menu is laid out using mininum sizes
+						picker->SetMinimumSize(Gwen::Point(256, 128));
 						float defaultColor[3];
 						Gwen::Utility::Strings::To::Floats( m_TextBox->GetText().Get(), defaultColor, 3 );
 						picker->SetColor( Gwen::Color( defaultColor[0], defaultColor[1], defaultColor[2], 255 ), false, true );
@@ -72,27 +81,30 @@ namespace Gwen
 						DoChanged();
 					}
 
-					virtual TextObject GetPropertyValue()
+					virtual TextObject GetPropertyValue() override
 					{
 						return m_TextBox->GetText();
 					}
 
-					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents )
+					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents ) override
 					{
+						float col[3];
+						Gwen::Utility::Strings::To::Floats( v.Get(), col, 3 );
+						m_Button->SetColor( Gwen::Color( col[0], col[1], col[2] ) );
 						m_TextBox->SetText( v, bFireChangeEvents );
 					}
 
-					virtual bool IsEditing()
+					virtual bool IsEditing() override
 					{
 						return m_TextBox == Gwen::KeyboardFocus;
 					}
 
-					virtual void DoChanged()
+					virtual void DoChanged() override
 					{
-						BaseClass::DoChanged();
 						float col[3];
 						Gwen::Utility::Strings::To::Floats( m_TextBox->GetText().Get(), col, 3 );
 						m_Button->SetColor( Gwen::Color( col[0], col[1], col[2] ) );
+						BaseClass::DoChanged();
 					}
 
 					Controls::Internal::ColourButton*		m_Button;

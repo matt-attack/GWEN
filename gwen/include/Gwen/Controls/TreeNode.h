@@ -34,14 +34,15 @@ namespace Gwen
 				virtual void Open();
 				virtual void Close();
 
+				virtual void CollapseAll();
 				virtual void ExpandAll();
 
 				virtual Button* GetButton();
 				virtual Button* GetToggleButton();
 
-				virtual void Render( Skin::Base* skin );
-				virtual void Layout( Skin::Base* skin );
-				virtual void PostLayout( Skin::Base* skin );
+				virtual void Render( Skin::Base* skin ) override;
+				virtual void Layout( Skin::Base* skin ) override;
+				virtual void PostLayout( Skin::Base* skin ) override;
 
 				virtual void SetRoot( bool b ) { m_bRoot = b; }
 				virtual void SetTreeControl( TreeControl* pCtrl ) { m_TreeControl = pCtrl; }
@@ -53,6 +54,7 @@ namespace Gwen
 				virtual void DeselectAll();
 
 				virtual Controls::Base::List & GetChildNodes();
+				virtual Controls::Base::List GetSelectedChildNodes();
 
 				Event::Caller	onNamePress;
 				Event::Caller   onDoubleClick;
@@ -61,16 +63,12 @@ namespace Gwen
 				Event::Caller	onSelect;
 				Event::Caller	onUnselect;
 
-
-				/*protected:*/
-				//virtual void OnMouseDoubleClickLeft(int x, int y) { onDoubleClick.Call(this); };
+			protected:
 
 				void OnToggleButtonPress( Base* control );
 				void OnDoubleClickName( Base* control );
 				void OnRightPress( Base* control );
 				void OnClickName( Base* control );
-
-			protected:
 
 				TreeControl*	m_TreeControl;
 				Button*			m_ToggleButton;

@@ -22,9 +22,11 @@ namespace Gwen
 		{
 				GWEN_CONTROL( SliderBar, ControlsInternal::Dragger );
 
-				virtual void Render( Skin::Base* skin );
+				virtual void Render( Skin::Base* skin ) override;
 				virtual void SetHorizontal( bool b ) { m_bHorizontal = b; }
 				virtual bool IsHorizontal() { return m_bHorizontal; }
+
+				virtual bool ShouldRedrawOnHover() override { return true; }
 
 			protected:
 
@@ -39,29 +41,29 @@ namespace Gwen
 		{
 				GWEN_CONTROL( Slider, Base );
 
-				virtual void Render( Skin::Base* skin ) = 0;
-				virtual void Layout( Skin::Base* skin );
+				virtual void Render( Skin::Base* skin ) override = 0;
+				virtual void Layout( Skin::Base* skin ) override;
 
 				virtual void SetClampToNotches( bool bClamp ) { m_bClampToNotches = bClamp; }
 
 				virtual void SetNotchCount( int num ) { m_iNumNotches = num; }
 				virtual int GetNotchCount() { return m_iNumNotches; }
 
-				virtual void SetRange( float fMin, float fMax );
-				virtual float GetFloatValue();
-				virtual void SetFloatValue( float val, bool forceUpdate = true );
+				virtual void SetRange( double fMin, double fMax );
+				virtual double GetFloatValue();
+				virtual void SetFloatValue( double val, bool forceUpdate = true );
 
-				virtual float CalculateValue();
+				virtual double CalculateValue();
 				virtual void OnMoved( Controls::Base* control );
 
-				virtual void OnMouseClickLeft( int /*x*/, int /*y*/, bool /*bDown*/ ) {};
+				virtual void OnMouseClickLeft( int /*x*/, int /*y*/, bool /*bDown*/ ) override {};
 
-				virtual bool OnKeyRight( bool bDown )	{	if ( bDown ) { SetFloatValue( GetFloatValue() + 1, true ); } return true; }
-				virtual bool OnKeyLeft( bool bDown )	{	if ( bDown ) { SetFloatValue( GetFloatValue() - 1, true ); } return true; }
-				virtual bool OnKeyUp( bool bDown )		{	if ( bDown ) { SetFloatValue( GetFloatValue() + 1, true ); } return true; }
-				virtual bool OnKeyDown( bool bDown )	{	if ( bDown ) { SetFloatValue( GetFloatValue() - 1, true ); } return true; }
+				virtual bool OnKeyRight( bool bDown ) override	{	if ( bDown ) { SetFloatValue( GetFloatValue() + 1, true ); } return true; }
+				virtual bool OnKeyLeft( bool bDown ) override	{	if ( bDown ) { SetFloatValue( GetFloatValue() - 1, true ); } return true; }
+				virtual bool OnKeyUp( bool bDown )	 override	{	if ( bDown ) { SetFloatValue( GetFloatValue() + 1, true ); } return true; }
+				virtual bool OnKeyDown( bool bDown ) override   {	if ( bDown ) { SetFloatValue( GetFloatValue() - 1, true ); } return true; }
 
-				virtual void RenderFocus( Gwen::Skin::Base* skin );
+				virtual void RenderFocus( Gwen::Skin::Base* skin ) override;
 
 				Gwen::Event::Caller	onValueChanged;
 
@@ -70,17 +72,17 @@ namespace Gwen
 
 			protected:
 
-				virtual void SetValueInternal( float fVal );
+				virtual void SetValueInternal( double fVal );
 				virtual void UpdateBarFromValue(){};
 
 				ControlsInternal::SliderBar* m_SliderBar;
 				void OnBoundsChanged( Gwen::Rect oldBounds );
 				bool m_bClampToNotches;
 				int m_iNumNotches;
-				float m_fValue;
+				double m_fValue;
 
-				float m_fMin;
-				float m_fMax;
+				double m_fMin;
+				double m_fMax;
 
 		};
 	}

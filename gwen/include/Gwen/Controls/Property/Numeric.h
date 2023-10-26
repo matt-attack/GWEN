@@ -30,29 +30,38 @@ namespace Gwen
 						m_Numeric->Dock( Pos::Fill );
 						//m_Numeric->SetShouldDrawBackground( false );
 						m_Numeric->onChanged.Add( this, &BaseClass::OnPropertyValueChanged );
+						m_Numeric->onHoverEnter.Add( this, &ThisClass::OnPropertyHoverChanged );
+						m_Numeric->onHoverLeave.Add( this, &ThisClass::OnPropertyHoverChanged );
 					}
 
-					virtual TextObject GetPropertyValue()
+					virtual TextObject GetPropertyValue() override
 					{
-						return m_Numeric->GetText();
+						return Utility::ToString(m_Numeric->GetValueNumeric());
 					}
 
-					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents )
+					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents ) override
 					{
 						m_Numeric->SetText( v, bFireChangeEvents );
 					}
 
-					virtual bool IsEditing()
+					virtual bool IsEditing() override
 					{
 						return m_Numeric->HasFocus();
 					}
 
-					virtual bool IsHovered()
+					virtual bool IsHovered() override
 					{
 						return BaseClass::IsHovered() || m_Numeric->IsHovered();
 					}
 
 					NumericUpDown* m_Numeric;
+
+				private:
+
+					void OnPropertyHoverChanged( Gwen::Controls::Base* control )
+					{
+						Redraw();
+					}
 			};
 			
 			class GWEN_EXPORT Float : public Property::Base
@@ -70,22 +79,22 @@ namespace Gwen
 						m_Numeric->onChanged.Add( this, &BaseClass::OnPropertyValueChanged );
 					}
 
-					virtual TextObject GetPropertyValue()
+					virtual TextObject GetPropertyValue() override
 					{
-						return m_Numeric->GetText();
+						return Utility::ToString(m_Numeric->GetValueNumeric());
 					}
 
-					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents )
+					virtual void SetPropertyValue( const TextObject & v, bool bFireChangeEvents ) override
 					{
 						m_Numeric->SetText( v, bFireChangeEvents );
 					}
 
-					virtual bool IsEditing()
+					virtual bool IsEditing() override
 					{
 						return m_Numeric->HasFocus();
 					}
 
-					virtual bool IsHovered()
+					virtual bool IsHovered() override
 					{
 						return BaseClass::IsHovered() || m_Numeric->IsHovered();
 					}
