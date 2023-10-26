@@ -26,7 +26,7 @@ namespace Gwen
 				virtual void Layout( Skin::Base* skin ) override;
 				virtual void Render( Skin::Base* skin ) override;
 
-				virtual float CalculateValue() override;
+				virtual double CalculateValue() override;
 				virtual void UpdateBarFromValue() override;
 				virtual void OnMouseClickLeft( int x, int y, bool bDown ) override;
 		};

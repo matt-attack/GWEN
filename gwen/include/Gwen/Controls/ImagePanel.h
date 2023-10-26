@@ -82,11 +82,11 @@ namespace Gwen
 						if ( m_bKeepAspectRatio )
 						{
 							auto bounds = GetRenderBounds();
-							float ratio = m_Texture.width/m_Texture.height;
+							float ratio = ((float)m_Texture.width)/((float)m_Texture.height);
 							// check if we are constrained by height or width
 							if (bounds.w < bounds.h*ratio)
 							{
-								// too narrow
+								// too narrow, limit height to fill
 								bounds.h = bounds.w/ratio;
 							}
 							else

@@ -49,11 +49,11 @@ namespace Gwen
 				virtual void SetNotchCount( int num ) { m_iNumNotches = num; }
 				virtual int GetNotchCount() { return m_iNumNotches; }
 
-				virtual void SetRange( float fMin, float fMax );
-				virtual float GetFloatValue();
-				virtual void SetFloatValue( float val, bool forceUpdate = true );
+				virtual void SetRange( double fMin, double fMax );
+				virtual double GetFloatValue();
+				virtual void SetFloatValue( double val, bool forceUpdate = true );
 
-				virtual float CalculateValue();
+				virtual double CalculateValue();
 				virtual void OnMoved( Controls::Base* control );
 
 				virtual void OnMouseClickLeft( int /*x*/, int /*y*/, bool /*bDown*/ ) override {};
@@ -72,17 +72,17 @@ namespace Gwen
 
 			protected:
 
-				virtual void SetValueInternal( float fVal );
+				virtual void SetValueInternal( double fVal );
 				virtual void UpdateBarFromValue(){};
 
 				ControlsInternal::SliderBar* m_SliderBar;
 				void OnBoundsChanged( Gwen::Rect oldBounds );
 				bool m_bClampToNotches;
 				int m_iNumNotches;
-				float m_fValue;
+				double m_fValue;
 
-				float m_fMin;
-				float m_fMax;
+				double m_fMin;
+				double m_fMax;
 
 		};
 	}

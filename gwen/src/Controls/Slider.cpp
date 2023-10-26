@@ -47,12 +47,12 @@ void Slider::Layout( Skin::Base* skin )
 	BaseClass::Layout( skin );
 }
 
-float Slider::CalculateValue()
+double Slider::CalculateValue()
 {
 	return 0;
 }
 
-void Slider::SetFloatValue( float val, bool /*forceUpdate*/ )
+void Slider::SetFloatValue( double val, bool /*forceUpdate*/ )
 {
 	if ( val < m_fMin ) { val = m_fMin; }
 
@@ -64,12 +64,12 @@ void Slider::SetFloatValue( float val, bool /*forceUpdate*/ )
 	Redraw();
 }
 
-void Slider::SetValueInternal( float val )
+void Slider::SetValueInternal( double val )
 {
 	if ( m_bClampToNotches )
 	{
-		val = floorf( ( val * ( float ) m_iNumNotches ) + 0.5f );
-		val /= ( float ) m_iNumNotches;
+		val = floorf( ( val * ( double ) m_iNumNotches ) + 0.5f );
+		val /= ( double ) m_iNumNotches;
 	}
 
 	if ( m_fValue != val )
@@ -81,12 +81,12 @@ void Slider::SetValueInternal( float val )
 	UpdateBarFromValue();
 }
 
-float Slider::GetFloatValue()
+double Slider::GetFloatValue()
 {
 	return m_fMin + ( m_fValue * ( m_fMax - m_fMin ) );
 }
 
-void Slider::SetRange( float fMin, float fMax )
+void Slider::SetRange( double fMin, double fMax )
 {
 	m_fMin = fMin;
 	m_fMax = fMax;

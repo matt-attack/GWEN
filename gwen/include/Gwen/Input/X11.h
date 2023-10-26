@@ -76,7 +76,7 @@ namespace Gwen
 								if (key == XK_BackSpace) { iKey = Gwen::Key::Backspace; }
 								else if (key == XK_Tab) { iKey = Gwen::Key::Tab; }
 								else if (key == XK_Delete) { iKey = Gwen::Key::Delete; }
-								else if (key == XK_Return) { iKey = Gwen::Key::Return; }
+								else if (key == XK_Return || key == XK_KP_Enter) { iKey = Gwen::Key::Return; }
 								else if (key == XK_Left) { iKey = Gwen::Key::Left; }
 								else if (key == XK_Up) { iKey = Gwen::Key::Up; }
 								else if (key == XK_Down) { iKey = Gwen::Key::Down; }

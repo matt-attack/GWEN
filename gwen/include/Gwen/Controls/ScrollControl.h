@@ -54,6 +54,8 @@ namespace Gwen
 
 				virtual void Clear();
 
+				virtual void SizeToMinimum(bool yn) { m_bSizeDockedToMinimum = yn; }
+
 			protected:
 
 				virtual bool ContentsAreDocked();
@@ -62,6 +64,7 @@ namespace Gwen
 				bool m_bCanScrollV;
 
 				bool m_bAutoHideBars;
+				bool m_bSizeDockedToMinimum;
 
 				Controls::BaseScrollBar* m_VerticalScrollBar;
 				Controls::BaseScrollBar* m_HorizontalScrollBar;

@@ -42,7 +42,7 @@ namespace Gwen
 				virtual void Render( Skin::Base* skin );
 
 				void SetWindowSize(int x, int y);
-				void SetWindowPosition(Gwen::Point pos);
+				void SetPos(int x, int y);
 				Gwen::Point WindowPosition() { return m_WindowPos; }
 				
 				virtual void OnMove(int x, int y) { m_WindowPos = Gwen::Point(x,y); }
@@ -65,8 +65,6 @@ namespace Gwen
 				void SetRemoveWhenChildless(bool yn) { m_bRemoveWhenChildless = yn; }
 
 				void SetTitle( Gwen::String title );
-
-				void SetPos(int x, int y);
 
 				virtual Gwen::Controls::Base* GetControlAt( int x, int y, bool bOnlyIfMouseEnabled ) override;
 
@@ -93,7 +91,8 @@ namespace Gwen
 				void SWSizer_Moved();
 				void LeftSizer_Moved();
 				void RightSizer_Moved();
-				void VerticalSizer_Moved();
+				void TopVerticalSizer_Moved();
+				void BottomVerticalSizer_Moved();
 				void OnTitleDoubleClicked();
 
 				void*		m_pOSWindow;
@@ -108,6 +107,7 @@ namespace Gwen
 				ControlsInternal::Dragger*	m_RightSizer;
 				ControlsInternal::Dragger*	m_LeftSizer;
 				ControlsInternal::Dragger*	m_BottomSizer;
+				ControlsInternal::Dragger*  m_TopSizer;
 				Gwen::Controls::Label*		m_Title;
 
 

@@ -37,15 +37,15 @@ class TreeNodeText : public Button
 			SetHeight( 16 );
 		}
 
-		void UpdateColours()
+		void UpdateColours() override
 		{
-			if ( IsDisabled() )							{ return SetTextColor( GetSkin()->Colors.Button.Disabled ); }
+			if ( IsDisabled() )							{ return BaseClass::SetTextColor( GetSkin()->Colors.Button.Disabled ); }
 
-			if ( IsDepressed() || GetToggleState() )	{ return SetTextColor( GetSkin()->Colors.Tree.Selected ); }
+			if ( IsDepressed() || GetToggleState() )	{ return BaseClass::SetTextColor( GetSkin()->Colors.Tree.Selected ); }
 
-			if ( IsHovered() )							{ return SetTextColor( GetSkin()->Colors.Tree.Hover ); }
+			if ( IsHovered() )							{ return BaseClass::SetTextColor( GetSkin()->Colors.Tree.Hover ); }
 
-			SetTextColor( GetSkin()->Colors.Tree.Normal );
+			BaseClass::SetTextColor( GetSkin()->Colors.Tree.Normal );
 		}
 };
 
@@ -183,6 +183,21 @@ void TreeNode::ExpandAll()
 		if ( !pChild ) { continue; }
 
 		pChild->ExpandAll();
+	}
+}
+
+void TreeNode::CollapseAll()
+{
+	Close();
+	Base::List & children = GetChildNodes();
+
+	for ( Base::List::iterator iter = children.begin(); iter != children.end(); ++iter )
+	{
+		TreeNode* pChild = gwen_cast<TreeNode> ( *iter );
+
+		if ( !pChild ) { continue; }
+
+		pChild->CollapseAll();
 	}
 }
 

@@ -634,7 +634,11 @@ namespace Gwen
 
 		void OpenGL_Base::EnableVsync(bool yn)
 		{
+#ifdef WIN32
 			auto wglSwapIntervalEXT = (bool(*)(int))wglGetProcAddress("wglSwapIntervalEXT");
+#else
+			auto wglSwapIntervalEXT = (bool(*)(int))glXGetProcAddress((uint8_t*)"wglSwapIntervalEXT");
+#endif
 
 			wglSwapIntervalEXT(yn ? 1 : 0);
 		}

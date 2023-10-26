@@ -34,6 +34,7 @@ namespace Gwen
 				virtual void Open();
 				virtual void Close();
 
+				virtual void CollapseAll();
 				virtual void ExpandAll();
 
 				virtual Button* GetButton();

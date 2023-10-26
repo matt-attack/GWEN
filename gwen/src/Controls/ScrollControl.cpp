@@ -17,6 +17,7 @@ using namespace Gwen::ControlsInternal;
 
 GWEN_CONTROL_CONSTRUCTOR( ScrollControl )
 {
+	m_bSizeDockedToMinimum = false;
 	SetMouseInputEnabled( false );
 	m_VerticalScrollBar	= new VerticalScrollBar( this );
 	m_VerticalScrollBar->Dock( Pos::Right );
@@ -127,7 +128,7 @@ void ScrollControl::UpdateScrollBars()
 	int childrenWidth = 0;
 	int childrenHeight = 0;
 
-	if (ContentsAreDocked())
+	if (m_bSizeDockedToMinimum && ContentsAreDocked())
 	{
 		// If contents are docked, use their minimum size to determine the inner bounds
 		// use our dimensions as a minimum so they at least fill us
