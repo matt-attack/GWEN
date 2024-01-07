@@ -8,7 +8,7 @@ Supports multiple renderer backends, but OpenGL is by far best supported.
 
 ## Required Dependencies
 
-Windows: freeimage (already included)
+Windows: freeimage (already included)  
 Linux: libxcursor-dev mesa-common-dev libgui1-mesa-dev libfreeimage-dev libglewmx-dev
 
 ## Install and Build Instructions
