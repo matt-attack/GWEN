@@ -44,23 +44,23 @@ namespace Gwen
 				Base();
 				virtual ~Base();
 
-				virtual void Init() {};
+				virtual void Init() = 0;
 
-				virtual void Begin() {};
-				virtual void End() {};
+				virtual void Begin() = 0;
+				virtual void End() = 0;
 
-				virtual void EnableVsync(bool yn) {};
+				virtual void EnableVSync(bool yn) {};
 
-				virtual void SetDrawColor( Color color ) {};
+				virtual void SetDrawColor( Color color ) = 0;
 
-				virtual void DrawFilledRect( Gwen::Rect rect ) {};;
+				virtual void DrawFilledRect( Gwen::Rect rect ) = 0;
 
-				virtual void StartClip() {};
-				virtual void EndClip() {};
+				virtual void StartClip() = 0;
+				virtual void EndClip() = 0;
 
 				virtual void LoadTexture( Gwen::Texture* pTexture ) {};
 				virtual void FreeTexture( Gwen::Texture* pTexture ) {};
-				virtual void DrawTexturedRect( Gwen::Texture* pTexture, Gwen::Rect pTargetRect, float u1 = 0.0f, float v1 = 0.0f, float u2 = 1.0f, float v2 = 1.0f ) {};
+				virtual void DrawTexturedRect( Gwen::Texture* pTexture, Gwen::Rect pTargetRect, float u1 = 0.0f, float v1 = 0.0f, float u2 = 1.0f, float v2 = 1.0f ) = 0;
 				virtual void DrawMissingImage( Gwen::Rect pTargetRect );
 				virtual Gwen::Color PixelColour( Gwen::Texture* pTexture, unsigned int x, unsigned int y, const Gwen::Color & col_default = Gwen::Color( 255, 255, 255, 255 ) ) { return col_default; }
 

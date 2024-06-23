@@ -416,7 +416,14 @@ bool Gwen::Input::HandleAccelerator( Gwen::UnicodeChar chr )
 	else
 	{
 		chr = towupper(chr);
-		accelString += chr;
+		if (chr == ' ')
+		{
+			accelString += L"SPACE";
+		}
+		else
+		{
+			accelString += chr;
+		}
 	}
 
 	//Debug::Msg("Accelerator string :%S\n", accelString.c_str());
