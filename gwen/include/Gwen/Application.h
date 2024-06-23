@@ -47,7 +47,7 @@ class Application: public BaseApplication
 {
 	std::wstring default_font_ = L"Segoe UI";
 	double default_font_size_ = 10.0;
-	std::string skin_ = "DefaultSkin.png";
+	std::string skin_ = "";
 	
 	std::vector<Gwen::Controls::WindowCanvas*> canvases_;
 	
@@ -177,20 +177,41 @@ public:
 		Gwen::Controls::WindowCanvas* window_canvas = new Gwen::Controls::WindowCanvas(x, y, w, h, skin, title, is_menu);
 		window_canvas->SetSizable(!is_menu);
 
-		if (FILE* f = fopen(skin_.c_str(), "rb"))
+		// fall back to default if not set
+		std::string skin_file = skin_;
+		if (skin_file.length() == 0)
+		{
+			char buf[500];
+#ifdef _WIN32
+			GetModuleFileName(NULL, buf, 500);
+#else
+			readlink("/proc/self/exe", buf, 500);
+#endif
+			skin_file = buf;
+			auto index = skin_file.find_last_of("/");
+			if (index != std::string::npos)
+    			skin_file = skin_file.substr(0, index);
+			index = skin_file.find_last_of("\\");
+			if (index != std::string::npos)
+    			skin_file = skin_file.substr(0, index);
+			skin_file += "/DefaultSkin.png";
+		}
+
+		printf("Loading skin %s\n", skin_file.c_str());
+		if (FILE* f = fopen(skin_file.c_str(), "rb"))
 		{
 			fclose(f);
 		}
 		else
 		{
 			// create the skin from default
-			f = fopen(skin_.c_str(), "wb");
+			f = fopen(skin_file.c_str(), "wb");
 			fwrite(DefaultSkin_png, 1, DefaultSkin_png_size, f);
 			fclose(f);
 			printf("Skin doesnt exist. Creating from default.\n");
 		}
 
-		skin->Init(skin_);
+		skin->Init(skin_file);
 		skin->SetDefaultFont(default_font_, default_font_size_);
 
 		canvases_.push_back(window_canvas);
