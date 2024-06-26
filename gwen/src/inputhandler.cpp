@@ -318,7 +318,6 @@ bool Gwen::Input::OnMouseButton( int iMouseButton, bool bDown )
 	else if ( iMouseButton == 1 )	{ KeyData.RightMouseDown = bDown; }
 
 	// Double click.
-	// Todo: Shouldn't double click if mouse has moved significantly
 	bool bIsDoubleClick = false;
 
 	if ( bDown &&

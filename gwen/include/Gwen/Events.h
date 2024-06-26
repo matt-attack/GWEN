@@ -8,6 +8,7 @@
 #ifndef GWEN_EVENTS_H
 #define GWEN_EVENTS_H
 
+#include <functional>
 #include <list>
 #include "Gwen/Exports.h"
 #include "Gwen/Structures.h"
@@ -112,6 +113,7 @@ namespace Gwen
 				template <typename T> void Add( Event::Handler* ob, void ( T::*f )( Gwen::Event::Info ) ) { AddInternal( ob, static_cast<Handler::FunctionWithInformation>( f ) ); }
 				template <typename T> void Add( Event::Handler* ob, void ( T::*f )( Gwen::Event::Info ), void* data ) { AddInternal( ob, static_cast<Handler::FunctionWithInformation>( f ), data ); }
 				template <typename T> void Add( Event::Handler* ob, void ( T::*f )() ) { AddInternal( ob, static_cast<Handler::FunctionBlank>( f ) ); }
+				void Add( Event::Handler* pObject, const std::function<void()> fn );
 
 				template <typename T> void GlobalAdd( Event::Handler* ob, T f ) { AddInternal( ob, static_cast<Handler::GlobalFunction>( f ) ); }
 				void GlobalAdd( Event::Handler* ob, void ( *f )( Gwen::Event::Info ) ) { AddInternal( ob, static_cast<Handler::GlobalFunctionWithInformation>( f ) ); }
@@ -152,6 +154,7 @@ namespace Gwen
 					Handler::GlobalFunction					fnGlobalFunction;
 					Handler::GlobalFunctionWithInformation	fnGlobalFunctionInfo;
 					Handler::GlobalFunctionBlank			fnGlobalFunctionBlank;
+					std::function<void()>                   fnFunctional;
 
 					Event::Handler*			pObject;
 					void*					Data;

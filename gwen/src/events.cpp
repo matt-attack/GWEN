@@ -104,7 +104,19 @@ void Caller::Call( Controls::Base* pThis, Gwen::Event::Info information )
 
 		if ( h.fnGlobalFunctionBlank )
 		{ ( *h.fnGlobalFunctionBlank )(); }
+
+		if ( h.fnFunctional )
+		{ h.fnFunctional(); }
 	}
+}
+
+void Caller::Add( Event::Handler* pObject, const std::function<void()> fn )
+{
+	handler h;
+	h.fnFunctional = fn;
+	h.pObject = pObject;
+	m_Handlers.push_back( h );
+	pObject->RegisterCaller( this );
 }
 
 void Caller::AddInternal( Event::Handler* pObject, Event::Handler::Function pFunction )

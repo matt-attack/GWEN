@@ -102,7 +102,10 @@ namespace Gwen
                         case ButtonPress:
                             {
 								if (event.xbutton.button == 1)
+								{
+									if (!press && !Gwen::Input::IsLeftMouseDown()) return true;
 									return Gwen::Input::OnMouseButton(0, press);
+								}
 								if (event.xbutton.button == 2)
 									return Gwen::Input::OnMouseButton(2, press);
 								if (event.xbutton.button == 3)
