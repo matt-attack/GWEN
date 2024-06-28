@@ -80,6 +80,10 @@ GWEN_CONTROL_CONSTRUCTOR( UnitTest )
 		ADD_UNIT_TEST( CollapsibleList );
 		ADD_UNIT_TEST( ColorPicker );
 	}
+	{
+		Controls::CollapsibleCategory* cat = pList->Add( "Layouts" );
+		ADD_UNIT_TEST( FormLayout );
+	}
 	m_StatusBar->SendToBack();
 	PrintText( L"Unit Test Started.\n" );
 	m_fLastSecond = Gwen::Platform::GetTimeInSeconds();
