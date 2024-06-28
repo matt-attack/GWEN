@@ -205,8 +205,8 @@ void Text::RefreshSize()
 		return;
 	}
 
-	Gwen::PointF p( 1, GetFont()->size );
-
+	float font_size = GetSkin()->GetRender()->FontScale()*GetFont()->size;
+	Gwen::PointF p( 1, font_size);
 	if ( Length() > 0 )
 	{
 		p = GetSkin()->GetRender()->MeasureText( GetFont(), m_String.GetUnicode() );
@@ -218,7 +218,7 @@ void Text::RefreshSize()
 	if ( p.x == Width() && p.y == Height() )
 	{ return; }
 
-	if ( p.y < GetFont()->size ) { p.y = GetFont()->size; }
+	if ( p.y < font_size ) { p.y = font_size; }
 
 	SetSize( p.x, p.y );
 	InvalidateParent();

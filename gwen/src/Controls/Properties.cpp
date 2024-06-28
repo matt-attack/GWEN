@@ -161,11 +161,14 @@ void PropertyRow::Layout( Gwen::Skin::Base* /*skin*/ )
 
 	m_Label->SetWidth( pParent->GetSplitWidth() );
 
-	int min_height = m_Label->TextHeight() + 7;//GetFont()->size + 7;okay, this should use the actual size of the text
-	if ( m_Property )
+	int h = 0;
+	for (const auto& c: GetChildren())
 	{
-		SetHeight( std::max(min_height, 0));//m_Property->GetRenderBounds().h) );
+		h = std::max<int>(h, c->GetMinimumSize().y);
 	}
+
+	int min_height = h + 7;
+	SetHeight( std::max(min_height, 0));
 }
 
 void PropertyRow::SetProperty( Property::Base* prop )
