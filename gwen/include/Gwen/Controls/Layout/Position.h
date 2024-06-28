@@ -8,7 +8,7 @@
 #ifndef GWEN_CONTROLS_LAYOUT_POSITION_H
 #define GWEN_CONTROLS_LAYOUT_POSITION_H
 
-#include "Gwen/Controls/Label.h"
+#include "Gwen/Controls/Base.h"
 #include "Gwen/Utility.h"
 
 
