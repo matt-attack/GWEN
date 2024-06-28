@@ -47,6 +47,18 @@ namespace Gwen
 						DoChanged();
 					}
 
+					virtual Gwen::Point GetMinimumSize() override
+					{
+						Gwen::Point min(1, 1);
+						for (const auto& c: GetChildren())
+						{
+							auto m = c->GetMinimumSize();
+							min.x = std::max(m.x, min.x);
+							min.y = std::max(m.y, min.y);
+						}
+						return min;
+					}
+
 					Event::Caller	onChange;
 			};
 		}

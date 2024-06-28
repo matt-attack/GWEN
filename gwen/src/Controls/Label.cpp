@@ -20,7 +20,6 @@ GWEN_CONTROL_CONSTRUCTOR( Label )
 	SetMouseInputEnabled( false );
 	SetBounds( 0, 0, 100, 10 );
 	m_iAlign = Gwen::Pos::Left | Gwen::Pos::Top;
-	//SetAlignment( Gwen::Pos::Left | Gwen::Pos::Top );
 }
 
 void Label::PreDelete( Gwen::Skin::Base* skin )

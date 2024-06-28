@@ -56,6 +56,8 @@ namespace Gwen
 				void SetTextPadding( const Padding & padding ) { m_Text->SetPadding( padding ); Invalidate(); InvalidateParent(); }
 				const Padding & GetTextPadding() { return m_Text->GetPadding(); }
 
+				virtual Gwen::Point GetMinimumSize() override { return Gwen::Point( 1, TextHeight() ); }
+
 				virtual TextObject GetValue() override { return GetText(); }
 				virtual void SetValue( const TextObject & strValue ) override { return SetText( strValue ); }
 
