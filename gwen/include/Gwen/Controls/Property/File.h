@@ -5,7 +5,7 @@
 
 #include "Gwen/Controls/Properties.h"
 #include "Gwen/Controls/Button.h"
-#include "Gwen/Controls/Dialogs/FolderOpen.h"
+#include "Gwen/Controls/Dialogs/FileOpen.h"
 
 namespace Gwen
 {
