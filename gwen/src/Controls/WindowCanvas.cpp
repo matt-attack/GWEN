@@ -408,6 +408,8 @@ void WindowCanvas::SetWindowSize(int x, int y)
 	Gwen::Platform::SetBoundsPlatformWindow( m_pOSWindow, m_WindowPos.x, m_WindowPos.y, width, height);
 
 	SetSize(x, y);
+	BaseClass::DoThink();
+	RenderCanvas();
 }
 
 void WindowCanvas::CloseButtonPressed()
