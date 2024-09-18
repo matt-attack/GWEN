@@ -114,6 +114,7 @@ namespace Gwen
 				template <typename T> void Add( Event::Handler* ob, void ( T::*f )( Gwen::Event::Info ), void* data ) { AddInternal( ob, static_cast<Handler::FunctionWithInformation>( f ), data ); }
 				template <typename T> void Add( Event::Handler* ob, void ( T::*f )() ) { AddInternal( ob, static_cast<Handler::FunctionBlank>( f ) ); }
 				void Add( Event::Handler* pObject, const std::function<void()> fn );
+				void Add( const std::function<void()> fn );
 
 				template <typename T> void GlobalAdd( Event::Handler* ob, T f ) { AddInternal( ob, static_cast<Handler::GlobalFunction>( f ) ); }
 				void GlobalAdd( Event::Handler* ob, void ( *f )( Gwen::Event::Info ) ) { AddInternal( ob, static_cast<Handler::GlobalFunctionWithInformation>( f ) ); }
