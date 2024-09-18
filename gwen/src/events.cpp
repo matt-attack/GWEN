@@ -119,6 +119,14 @@ void Caller::Add( Event::Handler* pObject, const std::function<void()> fn )
 	pObject->RegisterCaller( this );
 }
 
+void Caller::Add( const std::function<void()> fn )
+{
+	handler h;
+	h.fnFunctional = fn;
+	h.pObject = 0;
+	m_Handlers.push_back( h );
+}
+
 void Caller::AddInternal( Event::Handler* pObject, Event::Handler::Function pFunction )
 {
 	handler h;
